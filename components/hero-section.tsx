@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Bike, Users, Truck } from "lucide-react"
-import Image from "next/image"
 
 interface HeroSectionProps {
   onShopNow: () => void
@@ -81,39 +80,22 @@ export function HeroSection({ onShopNow }: HeroSectionProps) {
           </div>
         </div>
 
-        {/* Right - Owners Images */}
-        <div className="flex items-center justify-center gap-4">
-          <div className="relative group">
+        {/* Right - Video */}
+        <div className="flex items-center justify-center">
+          <div className="relative group w-full max-w-2xl">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary/50 rounded-2xl blur opacity-25 group-hover:opacity-50 transition-opacity"></div>
             <div className="relative rounded-2xl overflow-hidden border border-border bg-card">
-              <Image
-                src="/images/img-0008.jpg"
-                alt="Maximus - Co-Founder"
-                width={280}
-                height={350}
-                className="object-cover w-full h-[280px] md:h-[350px]"
-              />
-              <div className="p-4 bg-card">
-                <h3 className="font-semibold text-foreground">Maximus</h3>
-                <p className="text-sm text-muted-foreground">Co-Founder</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="relative group mt-8">
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 to-primary rounded-2xl blur opacity-25 group-hover:opacity-50 transition-opacity"></div>
-            <div className="relative rounded-2xl overflow-hidden border border-border bg-card">
-              <Image
-                src="/images/img-0009.jpg"
-                alt="McLovin - Co-Founder"
-                width={280}
-                height={350}
-                className="object-cover w-full h-[280px] md:h-[350px]"
-              />
-              <div className="p-4 bg-card">
-                <h3 className="font-semibold text-foreground">McLovin</h3>
-                <p className="text-sm text-muted-foreground">Co-Founder</p>
-              </div>
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-auto object-cover"
+                style={{ maxHeight: "600px" }}
+              >
+                <source src="/video/You_didn't_use_my_image_of_McL.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
             </div>
           </div>
         </div>
