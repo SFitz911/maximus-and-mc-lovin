@@ -2,6 +2,13 @@
 
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { ArrowRight, Bike, Users, Truck, RotateCcw } from "lucide-react"
 
 interface HeroSectionProps {
@@ -14,6 +21,7 @@ export function HeroSection({ onShopNow }: HeroSectionProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [showReplay, setShowReplay] = useState(false)
   const [hasPlayed, setHasPlayed] = useState(false)
+  const [showStory, setShowStory] = useState(false)
 
   // Auto-play video after 3-5 second delay on component mount
   useEffect(() => {
@@ -98,7 +106,11 @@ export function HeroSection({ onShopNow }: HeroSectionProps) {
               Shop Bikes
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+            <Button 
+              variant="ghost" 
+              className="text-muted-foreground hover:text-foreground"
+              onClick={() => setShowStory(true)}
+            >
               Our Story
             </Button>
           </div>
@@ -150,6 +162,69 @@ export function HeroSection({ onShopNow }: HeroSectionProps) {
           )}
         </div>
       </div>
+
+      {/* Our Story Dialog */}
+      <Dialog open={showStory} onOpenChange={setShowStory}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-primary">
+              The Legend of Maximus & McLovin: A Tale of Two Wheels and One Red Menace
+            </DialogTitle>
+            <DialogDescription className="text-base pt-2">
+              How two mates from Wellington decided to beat a cable car. Seriously.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 text-foreground pt-4">
+            <p className="text-base leading-relaxed">
+              Picture this: Wellington, New Zealand. 2023. A crisp morning. Two mates, Maximus and McLovin, are standing at the bottom of the famously steep Lambton Quay, staring up at the iconic red cable car chugging its way up the hill.
+            </p>
+            
+            <p className="text-base leading-relaxed">
+              "I bet we could beat that," Maximus says, squinting at the cable car like it personally offended him. 
+              <span className="text-muted-foreground italic"> (He says this about most things, to be fair.)</span>
+            </p>
+            
+            <p className="text-base leading-relaxed">
+              "Mate, that's a cable car. It runs on electricity and rails. We have... legs," McLovin replies, already calculating the physics of this terrible idea in his head. 
+              <span className="text-muted-foreground italic"> But here's the thing—he was also already calculating how to win.</span>
+            </p>
+            
+            <p className="text-base leading-relaxed">
+              So begins the most ridiculous business plan in cycling history. See, Maximus and McLovin quickly realized that <span className="font-semibold text-primary">one person pedaling wasn't going to cut it</span>. Wellington hills don't mess around—they're like staircases that forgot they're supposed to be roads.
+            </p>
+            
+            <p className="text-base leading-relaxed">
+              "What if," Maximus proposes, eyes gleaming with the kind of madness that either leads to greatness or an A&E visit, 
+              <span className="text-primary font-semibold"> "we had TWO people pedaling? Dual power!"</span>
+            </p>
+            
+            <p className="text-base leading-relaxed">
+              McLovin, being the sensible one 
+              <span className="text-muted-foreground italic"> (relatively speaking)</span>, points out that tandem bikes exist. But not like THIS. Not bikes engineered specifically to <span className="font-semibold">dominate a hill and show a cable car who's boss</span>.
+            </p>
+            
+            <p className="text-base leading-relaxed">
+              Six months later, after more failed attempts than they'd care to admit 
+              <span className="text-muted-foreground italic"> (cable car drivers were starting to wave at them by name)</span>, they did it. They beat the red cable car. By three whole seconds. They celebrated like they'd won the Tour de France. 
+              <span className="text-muted-foreground italic"> The cable car, presumably, was unimpressed. Cable cars are notoriously bad sports.</span>
+            </p>
+            
+            <p className="text-base leading-relaxed">
+              And that, dear reader, is how Tandem Kubernetes Bicycle Company was born. Not from market research or customer surveys or any of that sensible nonsense. Just pure, unadulterated 
+              <span className="text-primary font-semibold"> "we're gonna beat that cable car"</span> energy.
+            </p>
+            
+            <p className="text-base leading-relaxed">
+              Today, our bikes are still built with that same spirit: <span className="font-semibold">two riders, one mission, zero limits</span>. Whether you're racing cable cars, conquering hills, or just enjoying the ride with someone special, we've got you covered.
+            </p>
+            
+            <p className="text-base leading-relaxed pt-2 border-t border-border">
+              <span className="font-semibold">P.S.</span> The cable car still hasn't forgiven us. We hear it mutters about "cheating" when we pass. 
+              <span className="text-muted-foreground italic"> Worth it.</span>
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
