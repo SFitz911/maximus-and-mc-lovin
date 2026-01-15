@@ -8,6 +8,9 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ onShopNow }: HeroSectionProps) {
+  // Encode the video path to handle apostrophe properly
+  const videoSrc = encodeURI("/video/You_didn't_use_my_image_of_McL.mp4")
+  
   return (
     <div className="h-full w-full flex flex-col">
       {/* Header */}
@@ -16,7 +19,7 @@ export function HeroSection({ onShopNow }: HeroSectionProps) {
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
             <Bike className="w-5 h-5 text-primary-foreground" />
           </div>
-          <span className="text-xl font-bold text-foreground">M&M Tandems</span>
+          <span className="text-xl font-bold text-foreground">Tandem Kubernetes Bicycle Company</span>
         </div>
         <nav className="hidden md:flex items-center gap-8">
           <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -81,7 +84,10 @@ export function HeroSection({ onShopNow }: HeroSectionProps) {
         </div>
 
         {/* Right - Video */}
-        <div className="flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 text-center">
+            Tandem Kubernetes Bicycle Company
+          </h2>
           <div className="relative group w-full max-w-2xl">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary/50 rounded-2xl blur opacity-25 group-hover:opacity-50 transition-opacity"></div>
             <div className="relative rounded-2xl overflow-hidden border border-border bg-card">
@@ -90,10 +96,11 @@ export function HeroSection({ onShopNow }: HeroSectionProps) {
                 loop
                 muted
                 playsInline
+                controls
                 className="w-full h-auto object-cover"
                 style={{ maxHeight: "600px" }}
               >
-                <source src="/video/You_didn't_use_my_image_of_McL.mp4" type="video/mp4" />
+                <source src={videoSrc} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </div>
