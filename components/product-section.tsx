@@ -3,7 +3,9 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Check, Star, Users, Bike, Weight } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { ArrowLeft, Check, Star, Users, Bike, Weight, Tag } from "lucide-react"
 import Image from "next/image"
 
 interface ProductSectionProps {
@@ -13,6 +15,7 @@ interface ProductSectionProps {
 
 export function ProductSection({ onBack, onBuyNow }: ProductSectionProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const [discountCode, setDiscountCode] = useState("")
 
   const handleBuyNow = async () => {
     setIsLoading(true)
@@ -26,6 +29,7 @@ export function ProductSection({ onBack, onBuyNow }: ProductSectionProps) {
         body: JSON.stringify({
           productId: "duo-cruiser-pro",
           quantity: 1,
+          ...(discountCode.trim() && { discountCode: discountCode.trim() }),
         }),
       })
 
@@ -132,6 +136,29 @@ export function ProductSection({ onBack, onBuyNow }: ProductSectionProps) {
             <Badge variant="destructive" className="bg-accent/10 text-accent border-accent/20">
               32% OFF
             </Badge>
+          </div>
+
+          {/* Discount Code Input */}
+          <div className="mb-6">
+            <Label htmlFor="discount-code" className="text-sm text-muted-foreground mb-2 block">
+              Have a discount code?
+            </Label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  id="discount-code"
+                  type="text"
+                  placeholder="Enter code"
+                  value={discountCode}
+                  onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+                  className="pl-10 bg-secondary border-border text-foreground placeholder:text-muted-foreground"
+                />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Discount will be applied at checkout
+            </p>
           </div>
 
           <div className="flex gap-4">

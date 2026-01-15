@@ -22,6 +22,12 @@ const PRODUCTS = {
   // Add more products here as needed
 } as const
 
+// Server-side discount codes - NEVER trust discount amounts from the frontend
+const DISCOUNT_CODES = {
+  SAVE10: 0.1, // 10% off
+  WELCOME20: 0.2, // 20% off
+} as const
+
 export async function POST(request: NextRequest) {
   try {
     // Initialize Stripe
@@ -29,7 +35,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json()
-    const { productId, quantity = 1 } = body
+    const { productId, quantity = 1, discountCode } = body
 
     // Validate product ID exists
     if (!productId || !PRODUCTS[productId as keyof typeof PRODUCTS]) {
@@ -45,12 +51,26 @@ export async function POST(request: NextRequest) {
     // Validate quantity
     const itemQuantity = Math.max(1, Math.floor(quantity || 1))
 
+    // Look up discount code server-side (silently ignore invalid codes)
+    let finalPrice: number = Number(product.price)
+    let discountPercentage = 0
+    
+    if (discountCode && typeof discountCode === "string") {
+      const discount = DISCOUNT_CODES[discountCode.toUpperCase() as keyof typeof DISCOUNT_CODES]
+      if (discount !== undefined) {
+        discountPercentage = discount
+        // Calculate discounted price (round to nearest cent)
+        finalPrice = Math.round(Number(product.price) * (1 - discountPercentage))
+      }
+      // Silently ignore invalid codes - don't reveal which codes exist
+    }
+
     // Get base URL for redirects
     const origin = request.headers.get("origin") || 
                    request.nextUrl.origin ||
                    (process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000")
 
-    // Create Stripe checkout session with server-side price
+    // Create Stripe checkout session with server-side price and discount
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
@@ -61,7 +81,7 @@ export async function POST(request: NextRequest) {
               name: product.name,
               description: product.description,
             },
-            unit_amount: product.price, // Server-side price in cents
+            unit_amount: finalPrice, // Server-side price with discount applied (in cents)
           },
           quantity: itemQuantity,
         },
@@ -71,6 +91,11 @@ export async function POST(request: NextRequest) {
       cancel_url: `${origin}/checkout`,
       metadata: {
         productId: productId as string,
+        ...(discountCode && discountPercentage > 0 && {
+          discountCode: discountCode.toUpperCase(),
+          originalPrice: product.price.toString(),
+          discountPercentage: (discountPercentage * 100).toString(),
+        }),
       },
     })
 
