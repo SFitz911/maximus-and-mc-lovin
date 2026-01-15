@@ -1,13 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Check, Bike, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { trackPaymentSucceeded } from "@/lib/analytics"
 
-export default function SuccessPage() {
+function SuccessContent() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get("session_id")
   const [isLoading, setIsLoading] = useState(true)
@@ -119,5 +119,22 @@ export default function SuccessPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-background">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading...</p>
+          </div>
+        </div>
+      }
+    >
+      <SuccessContent />
+    </Suspense>
   )
 }

@@ -5,16 +5,16 @@ This file tracks issues, problems, and notes for the API routes in this project.
 ## Issues Log
 
 ### Issue 1: PostHog Installation
-**Date:** 2025-01-XX
 **Status:** ✅ Resolved
-**Description:** 
-- Installed `posthog-js` package using npm (pnpm was not available)
-- Package successfully added to project dependencies
+**Problem:** pnpm not available, needed to install `posthog-js`
+**Fix:** Used `npm install posthog-js` instead. Package installed successfully.
 
-**Notes:** 
-- pnpm command not recognized, used npm instead
-- Package installed without errors
-- Integration pending (needs PostHog API key and configuration)
+---
+
+### Issue 2: Vercel Build Error - useSearchParams() Needs Suspense
+**Status:** ✅ Resolved
+**Problem:** Vercel build failed with `useSearchParams() should be wrapped in a suspense boundary at page "/success"`
+**Fix:** Split `app/success/page.tsx` into `SuccessContent` (uses `useSearchParams()`) and `SuccessPage` (wraps it in `<Suspense>`). Next.js 15 requirement for static generation.
 
 ---
 
