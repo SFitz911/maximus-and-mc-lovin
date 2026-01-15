@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Check, Bike, ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { trackPaymentSucceeded } from "@/lib/analytics"
 
 export default function SuccessPage() {
   const searchParams = useSearchParams()
@@ -12,13 +13,18 @@ export default function SuccessPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    // Track payment succeeded when page loads
+    if (sessionId) {
+      trackPaymentSucceeded(sessionId)
+    }
+
     // Simulate loading to show the session was processed
     const timer = setTimeout(() => {
       setIsLoading(false)
     }, 1000)
 
     return () => clearTimeout(timer)
-  }, [])
+  }, [sessionId])
 
   if (isLoading) {
     return (

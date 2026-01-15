@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ArrowLeft, Check, Star, Users, Bike, Weight, Tag } from "lucide-react"
 import Image from "next/image"
+import { trackClickedProduct, trackCheckoutInitiated, trackPaymentSubmitted, trackPaymentFailed } from "@/lib/analytics"
 
 interface ProductSectionProps {
   onBack: () => void
@@ -16,8 +17,18 @@ interface ProductSectionProps {
 export function ProductSection({ onBack, onBuyNow }: ProductSectionProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [discountCode, setDiscountCode] = useState("")
+  const productId = "duo-cruiser-pro"
+  const productName = "Duo Cruiser Pro Dual-Passenger Bicycle"
+
+  // Track product view when component mounts
+  useEffect(() => {
+    trackClickedProduct(productId, productName)
+  }, [])
 
   const handleBuyNow = async () => {
+    // Track checkout initiated
+    trackCheckoutInitiated()
+
     setIsLoading(true)
     try {
       // Call the Stripe checkout API
@@ -27,7 +38,7 @@ export function ProductSection({ onBack, onBuyNow }: ProductSectionProps) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          productId: "duo-cruiser-pro",
+          productId: productId,
           quantity: 1,
           ...(discountCode.trim() && { discountCode: discountCode.trim() }),
         }),
@@ -39,12 +50,17 @@ export function ProductSection({ onBack, onBuyNow }: ProductSectionProps) {
 
       const { url } = await response.json()
       
+      // Track payment submitted (when redirecting to Stripe Checkout)
+      trackPaymentSubmitted()
+      
       // Redirect to Stripe Checkout
       if (url) {
         window.location.href = url
       }
     } catch (error) {
       console.error("Checkout error:", error)
+      // Track payment failed
+      trackPaymentFailed("checkout_api_error")
       alert("Failed to start checkout. Please try again.")
       setIsLoading(false)
     }

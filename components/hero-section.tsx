@@ -12,6 +12,7 @@ import {
 import { ArrowRight, Bike, Users, Truck, RotateCcw, Play, Star } from "lucide-react"
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
+import { trackPageView } from "@/lib/analytics"
 
 interface HeroSectionProps {
   onShopNow: () => void
@@ -28,9 +29,10 @@ export function HeroSection({ onShopNow }: HeroSectionProps) {
   const [videoError, setVideoError] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
 
-  // Debug: log when component mounts
+  // Track page view when component mounts
   useEffect(() => {
     console.log("HeroSection mounted, videoSrc:", videoSrc)
+    trackPageView("landing")
   }, [])
 
   // Auto-play video after 3-5 second delay on component mount
