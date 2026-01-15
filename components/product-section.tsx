@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Check, Star, Users, Bike, Weight } from "lucide-react"
@@ -11,6 +12,39 @@ interface ProductSectionProps {
 }
 
 export function ProductSection({ onBack, onBuyNow }: ProductSectionProps) {
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleBuyNow = async () => {
+    setIsLoading(true)
+    try {
+      // Call the Stripe checkout API
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId: "duo-cruiser-pro",
+          quantity: 1,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to create checkout session")
+      }
+
+      const { url } = await response.json()
+      
+      // Redirect to Stripe Checkout
+      if (url) {
+        window.location.href = url
+      }
+    } catch (error) {
+      console.error("Checkout error:", error)
+      alert("Failed to start checkout. Please try again.")
+      setIsLoading(false)
+    }
+  }
   const features = ["Fits 2 Riders", "Aluminum Frame", "Free Assembly", "Lifetime Warranty"]
 
   return (
@@ -102,10 +136,11 @@ export function ProductSection({ onBack, onBuyNow }: ProductSectionProps) {
 
           <div className="flex gap-4">
             <Button
-              onClick={onBuyNow}
+              onClick={handleBuyNow}
+              disabled={isLoading}
               className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 py-6 text-lg"
             >
-              Buy Now
+              {isLoading ? "Loading..." : "Buy Now"}
             </Button>
             <Button variant="outline" className="border-border text-foreground hover:bg-secondary py-6 bg-transparent">
               Add to Cart
