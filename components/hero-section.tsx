@@ -136,6 +136,13 @@ export function HeroSection({ onShopNow }: HeroSectionProps) {
         </Button>
       </header>
 
+      {/* Company Title Banner */}
+      <div className="px-8 py-4 border-b border-border bg-secondary/30">
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground text-center">
+          Tandem Kubernetes Bicycle Company
+        </h1>
+      </div>
+
       {/* Main Content */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8 px-8 py-6">
         {/* Left - Content */}
