@@ -9,47 +9,101 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { ArrowRight, Bike, Users, Truck, RotateCcw } from "lucide-react"
+import { ArrowRight, Bike, Users, Truck, RotateCcw, Play, Star } from "lucide-react"
+import Image from "next/image"
+import { Badge } from "@/components/ui/badge"
 
 interface HeroSectionProps {
   onShopNow: () => void
 }
 
 export function HeroSection({ onShopNow }: HeroSectionProps) {
-  // Encode the video path to handle apostrophe properly
-  const videoSrc = encodeURI("/video/You_didn't_use_my_image_of_McL.mp4")
+  // Video path - file renamed to remove apostrophe for better compatibility
+  const videoSrc = "/video/You_didnt_use_my_image_of_McL.mp4"
   const videoRef = useRef<HTMLVideoElement>(null)
   const [showReplay, setShowReplay] = useState(false)
   const [hasPlayed, setHasPlayed] = useState(false)
   const [showStory, setShowStory] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [videoError, setVideoError] = useState(false)
+  const [isMuted, setIsMuted] = useState(false)
+
+  // Debug: log when component mounts
+  useEffect(() => {
+    console.log("HeroSection mounted, videoSrc:", videoSrc)
+  }, [])
 
   // Auto-play video after 3-5 second delay on component mount
+  // Start muted for autoplay (browser requirement), then unmute when user interacts
   useEffect(() => {
     const delay = Math.random() * 2000 + 3000 // Random delay between 3-5 seconds
     const timer = setTimeout(() => {
-      if (videoRef.current && !hasPlayed) {
-        videoRef.current.play().catch((error) => {
-          console.error("Error playing video:", error)
-        })
-        setHasPlayed(true)
+      if (videoRef.current && !hasPlayed && !videoError) {
+        // Start muted for autoplay to work
+        videoRef.current.muted = true
+        setIsMuted(true)
+        videoRef.current.play()
+          .then(() => {
+            setIsPlaying(true)
+            setHasPlayed(true)
+          })
+          .catch((error) => {
+            console.error("Error playing video:", error)
+            setVideoError(true)
+          })
       }
     }, delay)
 
     return () => clearTimeout(timer)
-  }, [hasPlayed])
+  }, [hasPlayed, videoError])
 
   const handleVideoEnded = () => {
     setShowReplay(true)
+    setIsPlaying(false)
+  }
+
+  const handlePlay = () => {
+    if (videoRef.current) {
+      // Unmute when user clicks play
+      videoRef.current.muted = false
+      setIsMuted(false)
+      videoRef.current.play()
+        .then(() => {
+          setIsPlaying(true)
+          setShowReplay(false)
+          setHasPlayed(true)
+        })
+        .catch((error) => {
+          console.error("Error playing video:", error)
+          setVideoError(true)
+        })
+    }
   }
 
   const handleReplay = () => {
     if (videoRef.current) {
+      // Keep unmuted for replay (user-initiated)
+      videoRef.current.muted = false
+      setIsMuted(false)
       videoRef.current.currentTime = 0
-      videoRef.current.play().catch((error) => {
-        console.error("Error replaying video:", error)
-      })
-      setShowReplay(false)
+      videoRef.current.play()
+        .then(() => {
+          setIsPlaying(true)
+          setShowReplay(false)
+        })
+        .catch((error) => {
+          console.error("Error replaying video:", error)
+        })
     }
+  }
+
+  const handleVideoPlay = () => {
+    setIsPlaying(true)
+    setShowReplay(false)
+  }
+
+  const handleVideoPause = () => {
+    setIsPlaying(false)
   }
   
   return (
@@ -131,22 +185,50 @@ export function HeroSection({ onShopNow }: HeroSectionProps) {
         {/* Right - Video */}
         <div className="flex flex-col items-center justify-center">
           <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 text-center">
-            Tandem Kubernetes Bicycle Company
+            Maximus and McLovin - Founders
           </h2>
           <div className="relative group w-full max-w-2xl">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary/50 rounded-2xl blur opacity-25 group-hover:opacity-50 transition-opacity"></div>
             <div className="relative rounded-2xl overflow-hidden border border-border bg-card">
               <video
                 ref={videoRef}
-                muted
+                muted={isMuted}
                 playsInline
+                controls
                 onEnded={handleVideoEnded}
+                onPlay={handleVideoPlay}
+                onPause={handleVideoPause}
+                onLoadedData={() => {
+                  console.log("Video loaded successfully")
+                  setVideoError(false)
+                }}
+                onError={(e) => {
+                  const video = e.currentTarget
+                  const error = video.error
+                  console.error("Video error:", error)
+                  console.error("Error code:", error?.code)
+                  console.error("Error message:", error?.message)
+                  console.error("Video src:", videoSrc)
+                  setVideoError(true)
+                }}
                 className="w-full h-auto object-cover"
                 style={{ maxHeight: "600px" }}
               >
                 <source src={videoSrc} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
+              {(!isPlaying && !showReplay) && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                  <Button
+                    onClick={handlePlay}
+                    size="lg"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-8 rounded-full"
+                  >
+                    <Play className="w-8 h-8 mr-2" fill="currentColor" />
+                    Play Video
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
           {showReplay && (
@@ -158,6 +240,12 @@ export function HeroSection({ onShopNow }: HeroSectionProps) {
                 <RotateCcw className="w-4 h-4 mr-2" />
                 Replay
               </Button>
+            </div>
+          )}
+          {videoError && (
+            <div className="mt-4 text-sm text-destructive">
+              <p>Video failed to load. Please check the console for details.</p>
+              <p className="text-xs mt-1">Trying to load: {videoSrc}</p>
             </div>
           )}
         </div>
