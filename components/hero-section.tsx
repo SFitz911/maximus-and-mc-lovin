@@ -1,7 +1,8 @@
 "use client"
 
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Bike, Users, Truck } from "lucide-react"
+import { ArrowRight, Bike, Users, Truck, RotateCcw } from "lucide-react"
 
 interface HeroSectionProps {
   onShopNow: () => void
@@ -10,6 +11,38 @@ interface HeroSectionProps {
 export function HeroSection({ onShopNow }: HeroSectionProps) {
   // Encode the video path to handle apostrophe properly
   const videoSrc = encodeURI("/video/You_didn't_use_my_image_of_McL.mp4")
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [showReplay, setShowReplay] = useState(false)
+  const [hasPlayed, setHasPlayed] = useState(false)
+
+  // Auto-play video after 3-5 second delay on component mount
+  useEffect(() => {
+    const delay = Math.random() * 2000 + 3000 // Random delay between 3-5 seconds
+    const timer = setTimeout(() => {
+      if (videoRef.current && !hasPlayed) {
+        videoRef.current.play().catch((error) => {
+          console.error("Error playing video:", error)
+        })
+        setHasPlayed(true)
+      }
+    }, delay)
+
+    return () => clearTimeout(timer)
+  }, [hasPlayed])
+
+  const handleVideoEnded = () => {
+    setShowReplay(true)
+  }
+
+  const handleReplay = () => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0
+      videoRef.current.play().catch((error) => {
+        console.error("Error replaying video:", error)
+      })
+      setShowReplay(false)
+    }
+  }
   
   return (
     <div className="h-full w-full flex flex-col">
@@ -92,11 +125,10 @@ export function HeroSection({ onShopNow }: HeroSectionProps) {
             <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary/50 rounded-2xl blur opacity-25 group-hover:opacity-50 transition-opacity"></div>
             <div className="relative rounded-2xl overflow-hidden border border-border bg-card">
               <video
-                autoPlay
-                loop
+                ref={videoRef}
                 muted
                 playsInline
-                controls
+                onEnded={handleVideoEnded}
                 className="w-full h-auto object-cover"
                 style={{ maxHeight: "600px" }}
               >
@@ -105,6 +137,17 @@ export function HeroSection({ onShopNow }: HeroSectionProps) {
               </video>
             </div>
           </div>
+          {showReplay && (
+            <div className="mt-4">
+              <Button
+                onClick={handleReplay}
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Replay
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
